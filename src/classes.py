@@ -14,13 +14,12 @@ class Product:
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-
-        if isinstance(self, type(other)):
+        if type(self) == type(other):
             sum1 = self.price * self.quantity
             sum2 = other.price * other.quantity
             return sum1 + sum2
         else:
-            raise TypeError
+            raise TypeError("Нельзя складывать объекты разных классов")
 
     @classmethod
     def new_product(cls, params: dict):
@@ -70,7 +69,7 @@ class Category:
         return f"{self.name}, количество продуктов: {summ} шт."
 
     def add_product(self, product):
-        if not isinstance(product, Product) or not issubclass(type(product), Product):
+        if not isinstance(product, Product):
             raise TypeError("Нельзя добавлять объекты не типа Класс")
         else:
             self.__products.append(product)
