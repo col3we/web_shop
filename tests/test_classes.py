@@ -35,6 +35,8 @@ def test_init_product(product):
     assert product.description == "512GB, Gray space"
     assert product.price == 250000.0
     assert product.quantity == 7
+    with pytest.raises(ValueError):
+        product1 = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
 
 
 def test_init_category(category):
@@ -63,13 +65,16 @@ def test_product_add_new():
     assert new_product.price == 180000.0
 
 
+@patch("src.classes.MixinClass.product_log", return_value="")
 @patch("builtins.input")
-def test_product_price_set(mock_input, capsys):
+def test_product_price_set(mock_input, mock_log, capsys):
     product = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     assert product.price == 210000.0
+    mock_input.return_value = "y"
     product.price = -100
     captured = capsys.readouterr()
     assert captured.out == "Цена не должна быть нулевая или отрицательная\n"
+    assert product.price == 210000.0
     mock_input.return_value = "y"
     product.price = 1000
     assert product.price == 1000
@@ -78,7 +83,8 @@ def test_product_price_set(mock_input, capsys):
     assert product.price == 1000
 
 
-def test_classes_methods(capsys):
+@patch("src.classes.MixinClass.product_log", return_value="")
+def test_classes_methods(mock_log, capsys):
     product1 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product2 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
     category = Category(
@@ -130,3 +136,16 @@ def test_subclasses_product():
     assert grass1.country == "Россия"
     assert grass1.germination_period == "7 дней"
     assert grass1.color == "Зеленый"
+
+
+def test_middle_price_category():
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 7)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 10)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 6)
+
+    category1 = Category("Смартфоны", "Категория смартфонов", [product1, product2, product3])
+
+    assert category1.middle_price() == 140333.33333333334
+
+    category_empty = Category("Смартфоны", "Категория смартфонов", [])
+    assert category_empty.middle_price() == 0
