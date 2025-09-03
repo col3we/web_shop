@@ -1,14 +1,44 @@
-class Product:
-    name: str
-    description: str
-    price: float
-    quantity: int
+from abc import ABC, abstractmethod
 
+
+class BaseProduct(ABC):  # pragma: no cover
+
+    @abstractmethod
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
         self.__price = price
         self.quantity = quantity
+
+    @abstractmethod
+    def new_product(self):
+        pass
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+
+class MixinClass:
+
+    def __repr__(self):
+        self.product_log()
+
+    def product_log(self):
+        print(f"{self.__class__.__name__}({self.name}, {self.description}, {self.price}, {self.quantity})")
+
+
+class Product(MixinClass, BaseProduct):
+    def __init__(self, name, description, price, quantity):
+        self.name = name
+        self.description = description
+        self.__price = price
+        self.quantity = quantity
+        super().__repr__()
 
     def __str__(self):
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
@@ -47,9 +77,6 @@ class Product:
 
 
 class Category:
-    name: str
-    description: str
-    products: list
     product_count = 0
     category_count = 0
 
